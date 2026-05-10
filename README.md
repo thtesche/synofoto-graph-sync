@@ -1,4 +1,4 @@
-# Syno-Graph-Sync
+# Synofoto-Graph-Sync
 
 **Goal:** Synchronize Synology Photos metadata and AI tags into a Neo4j GraphDB.
 
@@ -6,16 +6,9 @@
 
 ## 📂 Project Structure
 
-```text
-synofoto-graph-sync/
-├── src/
-│   └── synofoto_graph_sync/   # Core logic
-├── scripts/
-│   └── hello_world_check.py   # Connection test
-├── README.md
-├── requirements.txt
-└── .gitignore
-```
+- `hello_world_check.py`: Connection test for PostgreSQL and Neo4j.
+- `README.md`: This documentation.
+- `requirements.txt`: Python dependencies.
 
 ---
 
@@ -26,13 +19,13 @@ Before the script can run, we need the Graph Database. On the Synology, it's bes
 **Docker Run Command (or via Compose):**
 Create a new instance with the following parameters:
 
-* **Image:** `neo4j:latest`
-* **Ports:**
-    * `7474` (HTTP for the browser interface)
-    * `7687` (Bolt protocol for the Python script)
-* **Volumes:** Create a folder `/docker/neo4j/data` to store data persistently.
-* **Environment Variables:**
-    * `NEO4J_AUTH=neo4j/your_password`
+- **Image:** `neo4j:latest`
+- **Ports:**
+  - `7474` (HTTP for the browser interface)
+  - `7687` (Bolt protocol for the Python script)
+- **Volumes:** Create a folder `/docker/neo4j/data` to store data persistently.
+- **Environment Variables:**
+  - `NEO4J_AUTH=neo4j/your_password`
 
 ---
 
@@ -43,6 +36,7 @@ Create a new instance with the following parameters:
 1. Connect to the Synology via SSH: `ssh user@nas-ip`.
 2. Create directory: `mkdir -p /volume1/scripts/photo-graph-sync`.
 3. Create virtual environment:
+
 ```bash
 cd /volume1/scripts/photo-graph-sync
 python3 -m venv venv
