@@ -6,8 +6,12 @@
 
 ## 📂 Project Structure
 
-- `hello_world_check.py`: Connection test for PostgreSQL and Neo4j.
-- `README.md`: This documentation.
+- `sync.py`: Main entry point for the synchronization process.
+- `scripts/hello_world_check.py`: Connection test for PostgreSQL and Neo4j.
+- `src/synofoto_graph_sync/`: Core logic modules.
+  - `extractor.py`: Handles PostgreSQL data extraction.
+  - `parser.py`: Extracts XMP/EXIF tags from image files.
+  - `importer.py`: Handles Neo4j data ingestion.
 - `requirements.txt`: Python dependencies.
 
 ---
@@ -41,20 +45,41 @@ Create a new instance with the following parameters:
 cd /volume1/scripts/photo-graph-sync
 python3 -m venv venv
 source venv/bin/activate
-pip install psycopg2-binary py2neo
+pip install -r requirements.txt
 ```
 
-### Step B: Allow Database Access
+### Step B: Configuration
+
+Edit `sync.py` to set your Neo4j password and database paths if they differ from the defaults.
+
+### Step C: Allow Database Access
 
 To allow the script to read the `synofoto` DB, the `root` user or an authorized user must be used. Since the script runs as `root` via the Task Scheduler, access to the Unix socket is usually directly possible.
 
 ---
 
-## 3. Development Plan (Milestones)
+## 3. Usage
 
-| Phase | Content | Goal |
+### Connection Test
+Run the check script to verify both databases are reachable:
+```bash
+python3 scripts/hello_world_check.py
+```
+
+### Run Sync
+Run the main synchronization script:
+```bash
+python3 sync.py
+```
+
+---
+
+## 4. Development Plan (Milestones)
+
+| Phase | Content | Status |
 | --- | --- | --- |
-| **Milestone 1** | **Metadata Extractor** | Read `unit_id`, `path`, and `person_name` from Postgres. |
-| **Milestone 2** | **XMP Parser** | Open image file from path and extract AI keywords/tags. |
-| **Milestone 3** | **Graph Importer** | Write `MERGE` statements in Cypher to avoid duplicates. |
-| **Milestone 4** | **Automation** | Set up cronjob in Synology Task Scheduler. |
+| **Milestone 1** | **Metadata Extractor** | ✅ Done |
+| **Milestone 2** | **XMP Parser** | ✅ Done |
+| **Milestone 3** | **Graph Importer** | ✅ Done |
+| **Milestone 4** | **Automation** | ✅ Done |
+
