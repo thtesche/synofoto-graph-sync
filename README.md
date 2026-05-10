@@ -7,7 +7,6 @@
 ## 📂 Project Structure
 
 - `sync.py`: Main entry point for the synchronization process.
-- `scripts/hello_world_check.py`: Connection test for PostgreSQL and Neo4j.
 - `src/synofoto_graph_sync/`: Core logic modules.
   - `extractor.py`: Handles PostgreSQL data extraction.
   - `parser.py`: Extracts XMP/EXIF tags from image files.
@@ -61,13 +60,17 @@ To allow the script to read the `synofoto` DB, the `root` user or an authorized 
 ## 3. Usage
 
 ### Connection Test
+
 Run the check script to verify both databases are reachable:
+
 ```bash
 python3 scripts/hello_world_check.py
 ```
 
 ### Run Sync
+
 Run the main synchronization script:
+
 ```bash
 python3 sync.py
 ```
@@ -82,4 +85,3 @@ python3 sync.py
 | **Milestone 2** | **XMP Parser** | ✅ Done |
 | **Milestone 3** | **Graph Importer** | ✅ Done |
 | **Milestone 4** | **Automation** | ✅ Done |
-
