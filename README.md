@@ -79,22 +79,22 @@ Before deploying to the NAS, initialize your local environment and configuration
 
    *This will create a `.env` file and prompt you for your NAS details.*
 
-### Step A.1: SSH Key Setup (Highly Recommended)
+2. Run the SSH key setup script (Highly Recommended):
 
-To avoid entering your password multiple times during deployment, run the SSH key setup script:
+   ```bash
+   ./setup_ssh_key.sh
+   ```
 
-```bash
-./setup_ssh_key.sh
-```
+   *This will generate an SSH key and copy it to your NAS to avoid password prompts.*
 
-*This will generate an SSH key (if you don't have one) and copy it to your NAS.*
+3. Open the newly created `.env` file and verify the settings, especially the `NEO4J_PASSWORD`.
 
-#### ⚠️ Troubleshooting SSH Key Login
+#### 💡 Troubleshooting SSH Key Login
 
-If you are still prompted for a password after running the script, Synology's strict folder permissions are likely the cause. To fix this:
+If you are still prompted for a password, Synology's strict folder permissions are likely the cause. To fix this:
 
 1. Log into your NAS via SSH (using your password).
-2. Run these commands to fix the directory permissions:
+2. Run these commands:
 
    ```bash
    chmod 711 ~
@@ -102,9 +102,7 @@ If you are still prompted for a password after running the script, Synology's st
    chmod 600 ~/.ssh/authorized_keys
    ```
 
-*SSH requires that only the owner has write access to these folders. Synology defaults are often too permissive.*
-
-1. Open the newly created `.env` file and verify the settings, especially the `NEO4J_PASSWORD`.
+*Note: SSH requires that only the owner has write access to these folders. Synology defaults are often too permissive.*
 
 ### Step B: Remote Directory Preparation (One-time)
 
@@ -138,7 +136,7 @@ Use the `copy_to_nas.sh` script to synchronize the project files to the NAS.
    ./copy_to_nas.sh
    ```
 
-   *This script uses a `tar` pipe over SSH to copy only the necessary application files to your NAS, automatically excluding local development folders and Mac metadata.*
+   *This script uses a `tar` pipe over SSH to copy only the necessary application files to your NAS.*
 
 ### Step D: Remote Setup (Python Environment)
 
