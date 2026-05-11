@@ -206,7 +206,7 @@ To keep your graph database up-to-date, set up a task in the **Synology Task Sch
 
 | Phase | Content | Status |
 | --- | --- | --- |
-| **Milestone 1** | **Metadata Extractor** | ✅ Done |
-| **Milestone 2** | **XMP Parser** | ⏳ Paused |
-| **Milestone 3** | **Graph Importer** | ✅ Done |
-| **Milestone 4** | **Automation** | ✅ Done |
+| **Milestone 1** | **Metadata Extractor** | 🏗️ In Progress |
+| **Milestone 2** | **XMP Parser** | ⭕ OPEN |
+| **Milestone 3** | **Graph Importer** | ⭕ OPEN |
+| **Milestone 4** | **Automation** | ⭕ OPEN |
