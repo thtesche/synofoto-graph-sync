@@ -59,46 +59,121 @@ Before running the container, create persistent storage folders and set appropri
 
 ---
 
-## 2. Installation on Synology
+---
 
-### Step A: Set up Python Environment
-Connect to your NAS via SSH and run:
+## 2. Installation & Deployment
 
+### Step A: Local Setup
+Before deploying to the NAS, initialize your local environment and configuration:
+
+1. Run the local setup script:
+   ```bash
+   ./setup_local.sh
+   ```
+   *This will create a `.env` file and prompt you for your NAS details.*
+
+### Step A.1: SSH Key Setup (Highly Recommended)
+To avoid entering your password multiple times during deployment, run the SSH key setup script:
 ```bash
-cd /volume1/scripts/photo-graph-sync
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+./setup_ssh_key.sh
 ```
+*This will generate an SSH key (if you don't have one) and copy it to your NAS.*
 
-### Step B: Configuration
-Edit `sync.py` to match your environment:
-- Set `NEO4J_CONFIG` password.
-- Verify `PG_CONFIG` (default Unix socket is usually `/run/postgresql/`).
-- Set `PHOTO_ROOT` to the path where your photos are stored (e.g., `/volume1/photo`).
+#### ⚠️ Troubleshooting SSH Key Login
+If you are still prompted for a password after running the script, Synology's strict folder permissions are likely the cause. To fix this:
+1. Log into your NAS via SSH (using your password).
+2. Run these commands to fix the directory permissions:
+   ```bash
+   chmod 711 ~
+   chmod 700 ~/.ssh
+   chmod 600 ~/.ssh/authorized_keys
+   ```
+*SSH requires that only the owner has write access to these folders. Synology defaults are often too permissive.*
 
-### Step C: Database Access
-The script needs to read the `synofoto` PostgreSQL database. When running via the **Synology Task Scheduler**, it should run as `root` to have direct access to the database socket.
+2. Open the newly created `.env` file and verify the settings, especially the `NEO4J_PASSWORD`.
+
+### Step B: Remote Directory Preparation (One-time)
+Since system paths like `/volume1/scripts/` are protected, you must manually create the destination folder once and give your user ownership:
+
+1. SSH into your NAS:
+   ```bash
+   ssh your_user@nas-ip
+   ```
+2. Create the folder with sudo:
+   ```bash
+   sudo mkdir -p /volume1/scripts/synofoto-graph-sync
+   ```
+3. Change ownership to your user:
+   ```bash
+   sudo chown your_user:users /volume1/scripts/synofoto-graph-sync
+   ```
+
+### Step C: Deploy to NAS
+Use the `copy_to_nas.sh` script to synchronize the project files to the NAS.
+
+1. Run the script on your local machine:
+   ```bash
+   ./copy_to_nas.sh
+   ```
+   *This script uses a `tar` pipe over SSH to copy only the necessary application files to your NAS, automatically excluding local development folders and Mac metadata.*
+
+### Step D: Remote Setup (Python Environment)
+If the deployment script indicates that the `venv` is missing on the NAS, perform the following once:
+
+1. SSH into the NAS: `ssh your_user@nas-ip`.
+2. Navigate to the project: `cd /volume1/scripts/synofoto-graph-sync`.
+3. Create and initialize the environment:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+### Step E: User & Database Configuration
+
+| Service | Config Variable | Default | Role |
+| --- | --- | --- | --- |
+| **NAS SSH** | `NAS_USER` / `NAS_IP` | - | Used for deployment and SSH access. |
+| **PostgreSQL** | `PG_DB` / `PG_HOST` | `synofoto` | The internal Synology Photos database. |
+| **Neo4j** | `NEO4J_PASSWORD` | `your_password` | The graph database administrator account. |
+| **Task Scheduler**| - | `root` | Required for socket access to Postgres. |
 
 ---
 
 ## 3. Usage
 
-### Connection Test
-Verify that both the Synology DB and Neo4j are reachable:
+### Connection Test (Doctor Mode)
+Before running a full sync, verify that both databases are reachable using the built-in diagnostic tool:
 ```bash
-python3 scripts/hello_world_check.py
+# Must be run as root or via sudo for Postgres socket access
+sudo venv/bin/python sync.py --doctor
 ```
+*This checks both the PostgreSQL Unix socket and the Neo4j Bolt connection.*
 
 ### Run Sync
 Execute the main synchronization:
 ```bash
-python3 sync.py
+sudo venv/bin/python sync.py
 ```
 
 ---
 
-## 4. Development Plan (Milestones)
+## 4. Automation (Task Scheduler)
+
+To keep your graph database up-to-date, set up a task in the **Synology Task Scheduler**:
+
+1. Open **Control Panel** -> **Task Scheduler**.
+2. Click **Create** -> **Scheduled Task** -> **User-defined script**.
+3. **General**: Task name `Photo-Graph-Sync`, User `root`.
+4. **Schedule**: Set to Daily or hourly as desired.
+5. **Task Settings**: Run command:
+   ```bash
+   cd /volume1/scripts/synofoto-graph-sync && ./venv/bin/python sync.py >> sync.log 2>&1
+   ```
+
+---
+
+## 5. Development Plan (Milestones)
 
 | Phase | Content | Status |
 | --- | --- | --- |

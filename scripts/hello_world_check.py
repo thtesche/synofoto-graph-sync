@@ -1,24 +1,24 @@
-"""
-FILE: scripts/hello_world_check.py
-DESCRIPTION: Connection test for PostgreSQL (Synology) and Neo4j (Docker).
-"""
-
+import os
 import psycopg2
 from py2neo import Graph
+from dotenv import load_dotenv
 import sys
+
+# Load environment variables from .env file
+load_dotenv()
 
 # --- CONFIGURATION ---
 PG_CONFIG = {
-    "database": "synofoto",
-    "user": "postgres",
-    "host": "/run/postgresql/", # Unix socket path
-    "port": "5432"
+    "database": os.getenv("PG_DB", "synofoto"),
+    "user": os.getenv("PG_USER", "postgres"),
+    "host": os.getenv("PG_HOST", "/run/postgresql/"),
+    "port": os.getenv("PG_PORT", "5432")
 }
 
 NEO4J_CONFIG = {
-    "uri": "bolt://localhost:7687", # NAS IP if running elsewhere
-    "user": "neo4j",
-    "password": "your_password"
+    "uri": os.getenv("NEO4J_URI", "bolt://localhost:7687"),
+    "user": os.getenv("NEO4J_USER", "neo4j"),
+    "password": os.getenv("NEO4J_PASSWORD", "your_password")
 }
 
 def test_connections():

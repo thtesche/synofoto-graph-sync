@@ -17,6 +17,18 @@ class MetadataExtractor:
             logger.error(f"Failed to connect to PostgreSQL: {e}")
             raise
 
+    def check_connection(self):
+        """Simple check to see if database is reachable."""
+        try:
+            if not self.conn:
+                self.connect()
+            with self.conn.cursor() as cursor:
+                cursor.execute("SELECT 1")
+            return True
+        except Exception as e:
+            logger.error(f"PostgreSQL connection check failed: {e}")
+            return False
+
     def close(self):
         if self.conn:
             self.conn.close()

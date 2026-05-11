@@ -12,6 +12,15 @@ class GraphImporter:
             logger.error(f"Failed to connect to Neo4j: {e}")
             raise
 
+    def check_connection(self):
+        """Simple check to see if Neo4j is reachable."""
+        try:
+            self.graph.run("RETURN 1").evaluate()
+            return True
+        except Exception as e:
+            logger.error(f"Neo4j connection check failed: {e}")
+            return False
+
     def import_media_data(self, media_item):
         """
          media_item = {
