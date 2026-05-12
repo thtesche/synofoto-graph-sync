@@ -1,6 +1,6 @@
 # Synofoto-Graph-Sync
 
-**Goal:** Synchronize Synology Photos metadata and AI tags into a Neo4j Graph Database to enable powerful graph-based discovery and relationship analysis.
+**Goal:** Synchronize Synology Photos metadata and AI tags into a Graph Database (Memgraph or Neo4j) to enable powerful graph-based discovery and relationship analysis.
 
 ---
 
@@ -14,9 +14,9 @@
 
 ---
 
-## 1. Preparation: Neo4j Docker Setup
+## 1. Preparation: Graph Database Setup (Memgraph Recommended)
 
-To host the graph database on your Synology NAS, follow these steps in the **Container Manager**:
+To host the graph database on your Synology NAS, we recommend using **Memgraph** (highly performant and Bolt-compatible).
 
 ### A. Install Container Manager
 
@@ -158,7 +158,7 @@ If the deployment script indicates that the `venv` is missing on the NAS, perfor
 | --- | --- | --- | --- |
 | **NAS SSH** | `NAS_USER` / `NAS_IP` | - | Used for deployment and SSH access. |
 | **PostgreSQL** | `PG_DB` / `PG_HOST` | `synofoto` | The internal Synology Photos database. |
-| **Neo4j** | `NEO4J_PASSWORD` | `your_password` | The graph database administrator account. |
+| **Graph DB** | `GRAPHDB_URI` | `bolt://...` | Connection URI for Memgraph or Neo4j. |
 | **Task Scheduler** | - | `root` | Required for socket access to Postgres. |
 
 ---

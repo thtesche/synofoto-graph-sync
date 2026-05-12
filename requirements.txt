@@ -1,4 +1,4 @@
 psycopg2-binary
-py2neo
+neo4j
 Pillow
 python-dotenv

@@ -1,21 +1,44 @@
-from py2neo import Graph, Node, Relationship
+from neo4j import GraphDatabase
 import logging
 
 logger = logging.getLogger(__name__)
 
 class GraphImporter:
-    def __init__(self, uri, user, password):
+    def __init__(self, uri, user=None, password=None):
         try:
-            self.graph = Graph(uri, auth=(user, password))
-            logger.info("Connected to Neo4j")
+            # Handle optional authentication (Memgraph often has none by default)
+            driver_kwargs = {
+                "uri": uri,
+                "connection_timeout": 120.0,
+                "max_connection_lifetime": 600.0
+            }
+            
+            if user:
+                # Use provided user, even if password is empty
+                driver_kwargs["auth"] = (user, password or "")
+                logger.info(f"Connecting to Graph DB with user: {user}")
+            else:
+                # Try explicit empty auth which some Memgraph versions prefer
+                driver_kwargs["auth"] = ("", "") 
+                logger.info("Connecting to Graph DB with empty credentials")
+            
+            self.driver = GraphDatabase.driver(**driver_kwargs)
+            
+            # Verify connectivity immediately
+            self.driver.verify_connectivity()
+            logger.info("Connected to Graph Database (Memgraph/Bolt)")
         except Exception as e:
-            logger.error(f"Failed to connect to Neo4j: {e}")
+            logger.error(f"Failed to connect to Graph Database: {e}")
             raise
+
+    def close(self):
+        if hasattr(self, 'driver'):
+            self.driver.close()
 
     def check_connection(self):
         """Simple check to see if Neo4j is reachable."""
         try:
-            self.graph.run("RETURN 1").evaluate()
+            self.driver.verify_connectivity()
             return True
         except Exception as e:
             logger.error(f"Neo4j connection check failed: {e}")
@@ -23,30 +46,25 @@ class GraphImporter:
 
     def import_media_data(self, media_item):
         """
-         media_item = {
-            'unit_id': 123,
-            'filename': 'img.jpg',
-            'folder_path': '/photo/vacation',
-            'people': ['Alice', 'Bob'],
-            'tags': ['Summer', 'Beach']
-        }
+        Imports or updates media metadata and its relationships in the graph.
         """
-        # Create or update Image node
-        tx = self.graph.begin()
-        
-        # Cypher for Image
+        with self.driver.session() as session:
+            session.execute_write(self._import_transaction, media_item)
+
+    @staticmethod
+    def _import_transaction(tx, media_item):
+        # 1. Image Node
         image_query = """
         MERGE (i:Image {unit_id: $unit_id})
         SET i.filename = $filename,
             i.path = $path
-        RETURN i
         """
         tx.run(image_query, 
                unit_id=media_item['unit_id'], 
                filename=media_item['filename'], 
                path=f"{media_item['folder_path']}/{media_item['filename']}")
 
-        # People
+        # 2. People Relationships
         for person_name in media_item.get('people', []):
             person_query = """
             MATCH (i:Image {unit_id: $unit_id})
@@ -55,7 +73,7 @@ class GraphImporter:
             """
             tx.run(person_query, unit_id=media_item['unit_id'], person_name=person_name)
 
-        # Tags
+        # 3. Tag Relationships
         for tag_name in media_item.get('tags', []):
             tag_query = """
             MATCH (i:Image {unit_id: $unit_id})
@@ -63,8 +81,6 @@ class GraphImporter:
             MERGE (i)-[:HAS_TAG]->(t)
             """
             tx.run(tag_query, unit_id=media_item['unit_id'], tag_name=tag_name)
-
-        self.graph.commit(tx)
 
 if __name__ == "__main__":
     # Test block
@@ -77,3 +93,4 @@ if __name__ == "__main__":
         'tags': ['Test Tag']
     }
     # importer.import_media_data(sample)
+    importer.close()

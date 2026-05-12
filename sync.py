@@ -18,10 +18,10 @@ PG_CONFIG = {
     "port": os.getenv("PG_PORT", "5432")
 }
 
-NEO4J_CONFIG = {
-    "uri": os.getenv("NEO4J_URI", "bolt://localhost:7687"),
-    "user": os.getenv("NEO4J_USER", "neo4j"),
-    "password": os.getenv("NEO4J_PASSWORD", "your_password")
+GRAPHDB_CONFIG = {
+    "uri": os.getenv("GRAPHDB_URI", "bolt://localhost:7687"),
+    "user": os.getenv("GRAPHDB_USER", ""),      # Optional for Memgraph
+    "password": os.getenv("GRAPHDB_PASSWORD", "") # Optional for Memgraph
 }
 
 # Mapping Synology photo path to local filesystem path
@@ -42,21 +42,26 @@ def run_doctor():
         logger.info("✅ PostgreSQL: OK")
     else:
         logger.error("❌ PostgreSQL: FAILED")
+    extractor.close()
     
-    # 2. Check Neo4j
-    logger.info(f"Checking Neo4j at {NEO4J_CONFIG['uri']}...")
+    # 2. Check Graph Database (Memgraph)
+    logger.info(f"Checking Graph DB at {GRAPHDB_CONFIG['uri']}...")
+    importer = None
     try:
-        importer = GraphImporter(NEO4J_CONFIG["uri"], NEO4J_CONFIG["user"], NEO4J_CONFIG["password"])
-        neo_ok = importer.check_connection()
-        if neo_ok:
-            logger.info("✅ Neo4j: OK")
+        importer = GraphImporter(GRAPHDB_CONFIG["uri"], GRAPHDB_CONFIG["user"], GRAPHDB_CONFIG["password"])
+        graph_ok = importer.check_connection()
+        if graph_ok:
+            logger.info("✅ Graph DB: OK")
         else:
-            logger.error("❌ Neo4j: FAILED")
+            logger.error("❌ Graph DB: FAILED")
     except Exception as e:
-        logger.error(f"❌ Neo4j: FAILED ({e})")
-        neo_ok = False
+        logger.error(f"❌ Graph DB: FAILED ({e})")
+        graph_ok = False
+    finally:
+        if importer:
+            importer.close()
         
-    if pg_ok and neo_ok:
+    if pg_ok and graph_ok:
         logger.info("--- Everything looks good! 🚀 ---")
         return True
     else:
@@ -75,9 +80,10 @@ def main():
     logger.info("Starting Sync Process")
     
     extractor = MetadataExtractor(PG_CONFIG)
-    importer = GraphImporter(NEO4J_CONFIG["uri"], NEO4J_CONFIG["user"], NEO4J_CONFIG["password"])
+    importer = None
     
     try:
+        importer = GraphImporter(GRAPHDB_CONFIG["uri"], GRAPHDB_CONFIG["user"], GRAPHDB_CONFIG["password"])
         extractor.connect()
         media_items = extractor.fetch_media_with_people()
         logger.info(f"Found {len(media_items)} items in PostgreSQL")
@@ -101,6 +107,8 @@ def main():
         logger.error(f"Sync failed: {e}")
     finally:
         extractor.close()
+        if importer:
+            importer.close()
 
 if __name__ == "__main__":
     main()

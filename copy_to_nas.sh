@@ -2,7 +2,7 @@
 
 # Load configuration from .env
 if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+    export $(grep -v '^[[:space:]]*#' .env | grep -v '^[[:space:]]*$' | xargs)
 else
     echo "Error: .env file not found. Please run ./setup_local.sh first."
     exit 1
