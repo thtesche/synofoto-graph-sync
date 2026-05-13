@@ -1,5 +1,9 @@
 # Synofoto-Graph-Sync
 
+![Python CI](https://github.com/thtesche/synofoto-graph-sync/actions/workflows/ci.yml/badge.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
 **Goal:** Synchronize Synology Photos metadata and AI tags into a Graph Database (Memgraph or Neo4j) to enable powerful graph-based discovery and relationship analysis.
 
 ---
