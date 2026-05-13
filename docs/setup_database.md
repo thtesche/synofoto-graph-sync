@@ -99,4 +99,4 @@ Neo4j provides a robust environment and a powerful web interface for exploring y
 
 ---
 
-**💡 Tipp:** Nach der Einrichtung kannst du die Verbindung prüfen, indem du `http://[NAS-IP]:7474` (Neo4j) öffnest oder einen Bolt-Client (Memgraph) verwendest, um sicherzustellen, dass der Dienst läuft.
+**💡 Tip:** After setup, you can verify the connection by opening `http://[NAS-IP]:7474` (Neo4j) or using a Bolt client (Memgraph) to ensure the service is running correctly.
