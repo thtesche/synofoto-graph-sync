@@ -46,6 +46,8 @@ sudo venv/bin/python sync.py
 - [Graph Database Setup Guide](docs/setup_database.md) - Docker configuration & permissions.
 - [Installation & Deployment](docs/installation.md) - Local setup, SSH keys, and NAS deployment.
 - [Automation Guide](docs/automation.md) - Setting up the Synology Task Scheduler.
+- [Graph Model Design (POLE+O)](design/lpg_pole_o_model.md) - Mapping between Postgres and Graph DB.
+- [Synology Photos Schema](design/synofoto_schema.md) - Reference for the synofoto database.
 
 ---
 
@@ -53,7 +55,7 @@ sudo venv/bin/python sync.py
 
 | Phase | Content | Status |
 | --- | --- | --- |
-| **Milestone 1** | **Metadata Extractor** | 🏗️ In Progress |
-| **Milestone 2** | **XMP Parser** | ⭕ OPEN |
-| **Milestone 3** | **Graph Importer** | ⭕ OPEN |
-| **Milestone 4** | **Automation** | ⭕ OPEN |
+| **Milestone 1** | **Metadata Extractor** | ✅ DONE |
+| **Milestone 2** | **XMP Parser** | ✅ DONE |
+| **Milestone 3** | **Graph Importer** | ✅ DONE |
+| **Milestone 4** | **Automation** | ✅ DONE |

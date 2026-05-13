@@ -22,7 +22,7 @@ Before deploying to the NAS, initialize your local environment and configuration
 
    *This will generate an SSH key and copy it to your NAS to avoid password prompts.*
 
-3. Open the newly created `.env` file and verify the settings, especially the `NEO4J_PASSWORD`.
+3. Open the newly created `.env` file and verify the settings, especially the `GRAPHDB_PASSWORD`.
 
 ### 💡 Troubleshooting SSH Key Login
 
