@@ -4,6 +4,12 @@
 
 ---
 
+## 🔗 Related Projects
+
+- **[macfotocli](https://github.com/thtesche/macfotocli)**: Tag your photos using local AI before syncing them to the graph. Perfect for enhancing discovery with custom recognized objects and scenes.
+
+---
+
 ## 🚀 Quick Start
 
 1. **[Database Setup](docs/setup_database.md)**: Install Neo4j or Memgraph on your NAS via Container Manager.
@@ -74,3 +80,9 @@ The project uses **Integration Tests** with real database schemas.
 | **Milestone 2** | **XMP Parser** | ✅ DONE |
 | **Milestone 3** | **Graph Importer** | ✅ DONE |
 | **Milestone 4** | **Automation** | ✅ DONE |
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).

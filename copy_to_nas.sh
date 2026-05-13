@@ -42,6 +42,7 @@ COPYFILE_DISABLE=1 tar -cz \
     --exclude='copy_to_nas.sh' \
     --exclude='.env.example' \
     --exclude='.gitignore' \
+    --exclude='LICENSE' \
     -f - . | ssh ${NAS_USER}@${NAS_IP} "tar -xz -C ${NAS_DEST_PATH}"
 
 if [ $? -ne 0 ]; then
@@ -50,7 +51,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Cleanup existing ._ files and setup scripts on NAS if any were already copied
-ssh ${NAS_USER}@${NAS_IP} "find ${NAS_DEST_PATH} -name '._*' -delete; rm -f ${NAS_DEST_PATH}/setup_*.sh ${NAS_DEST_PATH}/copy_to_nas.sh ${NAS_DEST_PATH}/*.md ${NAS_DEST_PATH}/.env.example ${NAS_DEST_PATH}/.gitignore ${NAS_DEST_PATH}/test.py ${NAS_DEST_PATH}/*.log ${NAS_DEST_PATH}/pyproject.toml; rm -rf ${NAS_DEST_PATH}/.github ${NAS_DEST_PATH}/.agents ${NAS_DEST_PATH}/.benchmarks ${NAS_DEST_PATH}/.ruff_cache ${NAS_DEST_PATH}/.pytest_cache ${NAS_DEST_PATH}/docs ${NAS_DEST_PATH}/tests ${NAS_DEST_PATH}/design ${NAS_DEST_PATH}/scratch"
+ssh ${NAS_USER}@${NAS_IP} "find ${NAS_DEST_PATH} -name '._*' -delete; rm -f ${NAS_DEST_PATH}/setup_*.sh ${NAS_DEST_PATH}/copy_to_nas.sh ${NAS_DEST_PATH}/*.md ${NAS_DEST_PATH}/.env.example ${NAS_DEST_PATH}/.gitignore ${NAS_DEST_PATH}/test.py ${NAS_DEST_PATH}/*.log ${NAS_DEST_PATH}/pyproject.toml ${NAS_DEST_PATH}/LICENSE; rm -rf ${NAS_DEST_PATH}/.github ${NAS_DEST_PATH}/.agents ${NAS_DEST_PATH}/.benchmarks ${NAS_DEST_PATH}/.ruff_cache ${NAS_DEST_PATH}/.pytest_cache ${NAS_DEST_PATH}/docs ${NAS_DEST_PATH}/tests ${NAS_DEST_PATH}/design ${NAS_DEST_PATH}/scratch"
 
 echo "--- Checking NAS Status ---"
 ssh $SSH_OPTS ${NAS_USER}@${NAS_IP} << nas_ssh
