@@ -3,9 +3,9 @@ import logging
 import argparse
 import sys
 from dotenv import load_dotenv
-from src.synofoto_graph_sync.extractor import MetadataExtractor
-from src.synofoto_graph_sync.parser import XMPParser
-from src.synofoto_graph_sync.importer import GraphImporter
+from synofoto_graph_sync.extractor import MetadataExtractor
+from synofoto_graph_sync.parser import XMPParser
+from synofoto_graph_sync.importer import GraphImporter
 
 # Load environment variables from .env file
 load_dotenv()

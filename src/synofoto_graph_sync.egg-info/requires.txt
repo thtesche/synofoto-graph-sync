@@ -1,0 +1,8 @@
+psycopg2-binary
+neo4j
+Pillow
+python-dotenv
+
+[dev]
+pytest
+ruff

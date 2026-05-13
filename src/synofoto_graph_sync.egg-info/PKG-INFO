@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: synofoto-graph-sync
+Version: 0.1.0
+Summary: Sync Synology Photos metadata to a Neo4j graph
+Requires-Dist: psycopg2-binary
+Requires-Dist: neo4j
+Requires-Dist: Pillow
+Requires-Dist: python-dotenv
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: ruff; extra == "dev"

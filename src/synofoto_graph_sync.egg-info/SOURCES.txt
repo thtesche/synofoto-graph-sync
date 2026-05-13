@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+src/synofoto_graph_sync/__init__.py
+src/synofoto_graph_sync/extractor.py
+src/synofoto_graph_sync/importer.py
+src/synofoto_graph_sync/parser.py
+src/synofoto_graph_sync.egg-info/PKG-INFO
+src/synofoto_graph_sync.egg-info/SOURCES.txt
+src/synofoto_graph_sync.egg-info/dependency_links.txt
+src/synofoto_graph_sync.egg-info/requires.txt
+src/synofoto_graph_sync.egg-info/top_level.txt
+tests/test_extractor.py
