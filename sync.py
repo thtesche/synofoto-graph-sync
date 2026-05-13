@@ -29,7 +29,6 @@ GRAPHDB_CONFIG = {
 }
 
 # Mapping Synology photo path to local filesystem path
-PHOTO_ROOT = os.getenv("PHOTO_ROOT", "/volume1/photo")
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -175,7 +174,7 @@ def main():
                 continue
 
             # Construct full path for XMP parsing
-            file_path = os.path.join(PHOTO_ROOT, _folder.lstrip('/'), item['filename'])
+            file_path = os.path.join(_folder, item['filename'])
             
             logger.info(f"Processing: {file_path}")
             

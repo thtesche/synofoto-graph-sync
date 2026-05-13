@@ -25,14 +25,21 @@ def test_fetch_media_with_people(postgres_container):
     unit100 = next(r for r in results if r['unit_id'] == 100)
     assert set(unit100['people']) == {'Alice', 'Bob'}
     assert unit100['tags'] == ['Landscape']
-    assert unit100['address_parts'] == ['Germany', 'Berlin', 'Mitte']
+    assert unit100['address_parts'] == [
+        {'level': 1, 'value': 'Germany'},
+        {'level': 2, 'value': 'Berlin'},
+        {'level': 3, 'value': 'Mitte'}
+    ]
     assert unit100['latitude'] == 52.52
     
     # pic2.jpg (id 101) has Charlie, 2 tags, and 2 address parts
     unit101 = next(r for r in results if r['unit_id'] == 101)
     assert unit101['people'] == ['Charlie']
     assert set(unit101['tags']) == {'Landscape', 'Architecture'}
-    assert unit101['address_parts'] == ['Germany', 'Hamburg']
+    assert unit101['address_parts'] == [
+        {'level': 1, 'value': 'Germany'},
+        {'level': 2, 'value': 'Hamburg'}
+    ]
     
     extractor.close()
 

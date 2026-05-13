@@ -10,7 +10,7 @@ The central node representing a media unit (image).
 - **Properties**:
   - `id`: Internal Synology unit ID (e.g., `55839`)
   - `filename`: Original filename (e.g., `20260227_091142.jpg`)
-  - `path`: Folder path relative to photo root (e.g., `/2026/02`)
+  - `path`: Absolute folder path on the NAS (e.g., `/volume1/photo/2026/02`)
   - `latitude`: GPS Latitude (if available)
   - `longitude`: GPS Longitude (if available)
 
@@ -55,9 +55,8 @@ Geographical entities derived from the address table.
 | `:HAS_PERSON` | `Photo` | `Person` | Links a photo to the recognized persons. |
 | `:BELONGS_TO_FAMILY` | `Person` | `Family` | Groups persons into families. |
 | `:HAS_OBJECT` | `Photo` | `Object` | Links a photo to AI tags and objects. |
-| `:LOCATED_AT` | `Photo` | `City` | Links a photo to its most specific location (City). |
-| `:PART_OF` | `City` | `Region` | Hierarchical link from City to Region. |
-| `:PART_OF` | `Region` | `Country` | Hierarchical link from Region to Country. |
+| `:LOCATED_AT` | `Photo` | `Location` | Links a photo to its most specific location. |
+| `:PART_OF` | `Location` | `Location` | Hierarchical link (e.g., Street -> City -> Country). |
 
 ---
 
@@ -93,3 +92,20 @@ Tags are gathered from two sources and merged before import:
 
 ### Family Extraction
 The `Family` node is created by splitting the `Person.name` by space. If a surname is detected, a `Family` node is created and linked to the `Person`.
+
+---
+
+## 6. Useful Cypher Queries
+
+For a detailed list of useful queries, see [useful_queries.md](useful_queries.md).
+
+### Quick Status Check
+```cypher
+MATCH (n) RETURN labels(n) as labels, count(n) as count;
+```
+
+### Find Photos by Country
+```cypher
+MATCH (l:Location {name: 'Deutschland'})<-[:PART_OF*0..]-(loc)<-[:LOCATED_AT]-(p:Photo) 
+RETURN p.filename, loc.name;
+```

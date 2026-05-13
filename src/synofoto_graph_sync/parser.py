@@ -14,7 +14,6 @@ class XMPParser:
         """
         tags = []
         if not os.path.exists(file_path):
-            logger.warning(f"File not found: {file_path}")
             return tags
 
         try:
