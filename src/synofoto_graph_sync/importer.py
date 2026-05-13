@@ -62,9 +62,16 @@ class GraphImporter:
         photo_query = """
         MERGE (p:Photo {id: $unit_id})
         SET p.filename = $filename,
-            p.folder = $folder_path
+            p.folder = $folder_path,
+            p.latitude = $latitude,
+            p.longitude = $longitude
         """
-        tx.run(photo_query, unit_id=unit_id, filename=filename, folder_path=folder_path)
+        tx.run(photo_query, 
+               unit_id=unit_id, 
+               filename=filename, 
+               folder_path=folder_path,
+               latitude=media_item.get('latitude'),
+               longitude=media_item.get('longitude'))
 
         # 2. Owner Node
         if owner:
@@ -76,7 +83,7 @@ class GraphImporter:
             tx.run(owner_query, unit_id=unit_id, owner=owner)
 
         # 3. Person & Family Relationships
-        for person_name in media_item.get('people', []):
+        for person_name in media_item.get('people') or []:
             person_query = """
             MATCH (p:Photo {id: $unit_id})
             MERGE (per:Person {name: $person_name})
@@ -96,13 +103,65 @@ class GraphImporter:
                 tx.run(family_query, person_name=person_name, family_name=family_name)
 
         # 4. Object (Tags) Relationships
-        for tag_name in media_item.get('tags', []):
+        for tag_name in media_item.get('tags') or []:
             tag_query = """
             MATCH (p:Photo {id: $unit_id})
             MERGE (o:Object {name: $tag_name})
             MERGE (p)-[:HAS_OBJECT]->(o)
             """
             tx.run(tag_query, unit_id=unit_id, tag_name=tag_name)
+
+        # 5. Location Hierarchy
+        address_parts = media_item.get('address_parts') or []
+        if address_parts:
+            # Mapping from Synology level to Graph Label
+            LEVEL_MAP = {
+                1: "Country",
+                2: "State",
+                3: "County",
+                4: "City",
+                5: "District",
+                6: "Street"
+            }
+            
+            prev_label = None
+            prev_name = None
+            
+            for part in address_parts:
+                level = part.get('level')
+                part_name = part.get('value')
+                if not part_name:
+                    continue
+                    
+                # Get label from map or fallback
+                label = LEVEL_MAP.get(level, "SubLocation")
+                if level and level > 6:
+                    label = "Street" # Everything beyond 6 is likely street-specific
+                
+                # Merge the location node
+                loc_merge = f"MERGE (l:{label} {{name: $part_name}})"
+                tx.run(loc_merge, part_name=part_name)
+                
+                # Link to parent (e.g., City -> County -> State -> Country)
+                if prev_name:
+                    link_query = f"""
+                    MATCH (child:{label} {{name: $part_name}})
+                    MATCH (parent:{prev_label} {{name: $prev_name}})
+                    MERGE (child)-[:PART_OF]->(parent)
+                    """
+                    tx.run(link_query, part_name=part_name, prev_name=prev_name)
+                
+                prev_label = label
+                prev_name = part_name
+
+            # Link Photo to the most specific location found
+            if prev_label and prev_name:
+                photo_loc_query = f"""
+                MATCH (p:Photo {{id: $unit_id}})
+                MATCH (l:{prev_label} {{name: $prev_name}})
+                MERGE (p)-[:LOCATED_AT]->(l)
+                """
+                tx.run(photo_loc_query, unit_id=unit_id, prev_name=prev_name)
 
 if __name__ == "__main__":
     # Test block

@@ -108,10 +108,17 @@ def main():
             _folder = item.get('folder_path', '')
             _people = ", ".join(item.get('people') or [])
             _tags = ", ".join(item.get('tags') or [])
-            _loc = ", ".join(item.get('address_parts') or [])
+            
+            # Extract values from address objects {'level': X, 'value': 'Y'}
+            _addr_objs = item.get('address_parts') or []
+            _loc = ", ".join([obj['value'] for obj in _addr_objs if 'value' in obj])
+            _lat = item.get('latitude')
+            _lon = item.get('longitude')
 
             if args.dry_run:
                 msg = f"DRY RUN - ID: {_id}, Filename: {item['filename']}, Folder: {_folder}, Owner: {item.get('owner')}"
+                if _lat and _lon:
+                    msg += f", GPS: ({_lat}, {_lon})"
                 if _people:
                     msg += f", People: [{_people}]"
                 if _tags:

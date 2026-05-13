@@ -50,7 +50,7 @@ class MetadataExtractor:
              FROM many_unit_has_many_general_tag muht 
              JOIN general_tag gt ON muht.id_general_tag = gt.id 
              WHERE muht.id_unit = u.id) AS tags,
-            (SELECT array_agg(ad.value ORDER BY ad.level) 
+            (SELECT jsonb_agg(jsonb_build_object('level', ad.level, 'value', ad.value) ORDER BY ad.level) 
              FROM address ad 
              WHERE ad.id_unit = u.id AND ad.lang = 0) AS address_parts
         FROM unit u

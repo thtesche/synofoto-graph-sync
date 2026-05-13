@@ -61,6 +61,7 @@ The project uses **Integration Tests** with real database schemas.
 - [Installation & Deployment](docs/installation.md) - Local setup, SSH keys, and NAS deployment.
 - [Automation Guide](docs/automation.md) - Setting up the Synology Task Scheduler.
 - [Graph Model Design (POLE+O)](design/lpg_pole_o_model.md) - Mapping between Postgres and Graph DB.
+- [Data Mapping & Graph Structure](docs/graph_mapping.md) - Technical details of the POLE+O implementation.
 - [Synology Photos Schema](design/synofoto_schema.md) - Reference for the synofoto database.
 
 ---
