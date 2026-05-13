@@ -1,4 +1,3 @@
-import pytest
 from synofoto_graph_sync.extractor import MetadataExtractor
 
 def test_extractor_initialization(postgres_container):

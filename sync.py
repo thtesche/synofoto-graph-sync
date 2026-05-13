@@ -112,9 +112,12 @@ def main():
 
             if args.dry_run:
                 msg = f"DRY RUN - ID: {_id}, Filename: {item['filename']}, Folder: {_folder}, Owner: {item.get('owner')}"
-                if _people: msg += f", People: [{_people}]"
-                if _tags: msg += f", DB-Tags: [{_tags}]"
-                if _loc: msg += f", Location: ({_loc})"
+                if _people:
+                    msg += f", People: [{_people}]"
+                if _tags:
+                    msg += f", DB-Tags: [{_tags}]"
+                if _loc:
+                    msg += f", Location: ({_loc})"
                 print(msg)
                 continue
 
