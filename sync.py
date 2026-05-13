@@ -1,7 +1,11 @@
 import os
+import sys
+
+# Erlaubt das direkte Ausführen ohne PYTHONPATH=src
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
+
 import logging
 import argparse
-import sys
 from dotenv import load_dotenv
 from synofoto_graph_sync.extractor import MetadataExtractor
 from synofoto_graph_sync.parser import XMPParser
@@ -71,6 +75,9 @@ def run_doctor():
 def main():
     parser = argparse.ArgumentParser(description="Synofoto to Neo4j Sync Tool")
     parser.add_argument("--doctor", action="store_true", help="Run diagnostic connection checks")
+    parser.add_argument("--path-filter", type=str, help="Filter images by folder path substring")
+    parser.add_argument("--owner", type=str, help="Set the owner for the images")
+    parser.add_argument("--dry-run", action="store_true", help="Print data to console instead of writing to DB")
     args = parser.parse_args()
 
     if args.doctor:
@@ -83,14 +90,30 @@ def main():
     importer = None
     
     try:
-        importer = GraphImporter(GRAPHDB_CONFIG["uri"], GRAPHDB_CONFIG["user"], GRAPHDB_CONFIG["password"])
         extractor.connect()
-        media_items = extractor.fetch_media_with_people()
+        
+        if args.path_filter:
+            media_items = extractor.fetch_media_by_path(args.path_filter, owner=args.owner)
+        else:
+            media_items = extractor.fetch_media_with_people(owner=args.owner)
+            
         logger.info(f"Found {len(media_items)} items in PostgreSQL")
         
+        if not args.dry_run:
+            importer = GraphImporter(GRAPHDB_CONFIG["uri"], GRAPHDB_CONFIG["user"], GRAPHDB_CONFIG["password"])
+        
         for item in media_items:
+            item['owner'] = args.owner if args.owner else item.get('owner_name')
+
+            if args.dry_run:
+                # 1. Wir schreiben die Daten noch nicht in die DB, sondern geben sie bei jedem sync auf der console aus
+                _id = item.get('id', item.get('unit_id'))
+                _folder = item.get('folder', item.get('folder_path'))
+                print(f"DRY RUN - ID: {_id}, Filename: {item['filename']}, Folder: {_folder}, Owner: {item.get('owner')}")
+                continue
+
             # Construct full path for XMP parsing
-            file_path = os.path.join(PHOTO_ROOT, item['folder_path'] or '', item['filename'])
+            file_path = os.path.join(PHOTO_ROOT, item.get('folder', item.get('folder_path')) or '', item['filename'])
             
             logger.info(f"Processing: {file_path}")
             
@@ -101,7 +124,10 @@ def main():
             # Milestone 3: Import to Neo4j
             importer.import_media_data(item)
             
-        logger.info("Sync completed successfully")
+        if args.dry_run:
+            logger.info("Dry run completed")
+        else:
+            logger.info("Sync completed successfully")
         
     except Exception as e:
         logger.error(f"Sync failed: {e}")

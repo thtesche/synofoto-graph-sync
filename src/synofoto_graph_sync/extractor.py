@@ -33,7 +33,7 @@ class MetadataExtractor:
         if self.conn:
             self.conn.close()
 
-    def fetch_media_with_people(self):
+    def fetch_media_with_people(self, owner=None):
         """
         Fetches media units and their associated recognized people.
         Note: The schema might vary slightly depending on the Synology Photos version.
@@ -43,20 +43,32 @@ class MetadataExtractor:
         SELECT 
             u.id AS unit_id,
             u.filename,
-            f.path AS folder_path,
-            p.name AS person_name
+            f.name AS folder_path,
+            p.name AS person_name,
+            ui.name AS owner_name
         FROM unit u
-        LEFT JOIN folder f ON u.folder_id = f.id
+        LEFT JOIN folder f ON u.id_folder = f.id
         LEFT JOIN many_unit_has_many_person mup ON u.id = mup.unit_id
         LEFT JOIN person p ON mup.person_id = p.id
-        WHERE u.type = 0 -- Assuming 0 is image, might need adjustment
-        ORDER BY u.id;
+        JOIN user_info ui ON u.id_user = ui.id
         """
+        params = []
+            
+        query += " WHERE u.type = 0" # Assuming 0 is image
+        
+        if owner:
+            query += " AND ui.name = %s"
+            params.append(owner)
+            
+        query += " ORDER BY u.id;"
         
         results = []
         try:
             with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
-                cursor.execute(query)
+                if params:
+                    cursor.execute(query, tuple(params))
+                else:
+                    cursor.execute(query)
                 rows = cursor.fetchall()
                 
                 # Group by unit_id since one media can have multiple people
@@ -68,6 +80,7 @@ class MetadataExtractor:
                             'unit_id': uid,
                             'filename': row['filename'],
                             'folder_path': row['folder_path'],
+                            'owner_name': row['owner_name'],
                             'people': []
                         }
                     if row['person_name']:
@@ -76,6 +89,50 @@ class MetadataExtractor:
                 results = list(media_map.values())
         except Exception as e:
             logger.error(f"Error fetching metadata: {e}")
+            
+        return results
+
+    def fetch_media_by_path(self, path_substring, owner=None):
+        """
+        Fetches media units matching a specific folder path.
+        """
+        query = """
+        SELECT 
+            u.id AS id,
+            u.filename AS filename,
+            f.name AS folder,
+            ui.name AS owner_name
+        FROM unit u
+        JOIN folder f ON u.id_folder = f.id
+        JOIN user_info ui ON u.id_user = ui.id
+        """
+        params = [f"%{path_substring}%"]
+            
+        query += " WHERE f.name LIKE %s AND u.type = 0"
+        
+        if owner:
+            query += " AND ui.name = %s"
+            params.append(owner)
+            
+        query += " ORDER BY u.id;"
+        
+        results = []
+        try:
+            with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(query, tuple(params))
+                rows = cursor.fetchall()
+                results = [dict(row) for row in rows]
+        except Exception as e:
+            logger.error(f"Error fetching metadata by path: {e}")
+            try:
+                self.conn.rollback()
+                query_fallback = query.replace("id_folder", "folder_id")
+                with self.conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    cursor.execute(query_fallback, tuple(params))
+                    rows = cursor.fetchall()
+                    results = [dict(row) for row in rows]
+            except Exception as fallback_e:
+                logger.error(f"Fallback error fetching metadata: {fallback_e}")
             
         return results
 
