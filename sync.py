@@ -179,9 +179,9 @@ def main():
             logger.info(f"Processing: {file_path}")
             
             # Milestone 2: Parse Tags from XMP (local file)
-            xmp_tags = XMPParser.extract_tags(file_path)
+            xmp_tags = XMPParser.extract_tags(file_path) or []
             # Merge with Synology DB tags (general_tag)
-            db_tags = item.get('tags', [])
+            db_tags = item.get('tags') or []
             item['tags'] = list(set(xmp_tags + db_tags))
             
             # Milestone 3: Import to Neo4j
