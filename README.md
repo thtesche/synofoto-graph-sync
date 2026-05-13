@@ -41,6 +41,20 @@ sudo venv/bin/python sync.py
 
 ---
 
+## 🧪 Development & Testing
+
+The project uses **Integration Tests** with real database schemas.
+
+- **Requirement**: You need a running Docker environment (Docker Desktop, OrbStack, or Colima) on your local machine.
+- **Run Tests**:
+  ```bash
+  venv/bin/pytest tests/
+  ```
+
+*The tests use `testcontainers` to automatically spin up a temporary PostgreSQL instance.*
+
+---
+
 ## 📂 Detailed Documentation
 
 - [Graph Database Setup Guide](docs/setup_database.md) - Docker configuration & permissions.
