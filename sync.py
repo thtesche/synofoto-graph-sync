@@ -104,22 +104,30 @@ def main():
         
         for item in media_items:
             item['owner'] = args.owner if args.owner else item.get('owner_name')
+            _id = item.get('unit_id')
+            _folder = item.get('folder_path', '')
+            _people = ", ".join(item.get('people') or [])
+            _tags = ", ".join(item.get('tags') or [])
+            _loc = ", ".join(item.get('address_parts') or [])
 
             if args.dry_run:
-                # 1. Wir schreiben die Daten noch nicht in die DB, sondern geben sie bei jedem sync auf der console aus
-                _id = item.get('id', item.get('unit_id'))
-                _folder = item.get('folder', item.get('folder_path'))
-                print(f"DRY RUN - ID: {_id}, Filename: {item['filename']}, Folder: {_folder}, Owner: {item.get('owner')}")
+                msg = f"DRY RUN - ID: {_id}, Filename: {item['filename']}, Folder: {_folder}, Owner: {item.get('owner')}"
+                if _people: msg += f", People: [{_people}]"
+                if _tags: msg += f", DB-Tags: [{_tags}]"
+                if _loc: msg += f", Location: ({_loc})"
+                print(msg)
                 continue
 
             # Construct full path for XMP parsing
-            file_path = os.path.join(PHOTO_ROOT, item.get('folder', item.get('folder_path')) or '', item['filename'])
+            file_path = os.path.join(PHOTO_ROOT, _folder.lstrip('/'), item['filename'])
             
             logger.info(f"Processing: {file_path}")
             
-            # Milestone 2: Parse Tags
-            tags = XMPParser.extract_tags(file_path)
-            item['tags'] = tags
+            # Milestone 2: Parse Tags from XMP (local file)
+            xmp_tags = XMPParser.extract_tags(file_path)
+            # Merge with Synology DB tags (general_tag)
+            db_tags = item.get('tags', [])
+            item['tags'] = list(set(xmp_tags + db_tags))
             
             # Milestone 3: Import to Neo4j
             importer.import_media_data(item)

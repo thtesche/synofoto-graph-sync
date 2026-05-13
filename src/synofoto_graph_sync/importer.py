@@ -53,34 +53,56 @@ class GraphImporter:
 
     @staticmethod
     def _import_transaction(tx, media_item):
-        # 1. Image Node
-        image_query = """
-        MERGE (i:Image {unit_id: $unit_id})
-        SET i.filename = $filename,
-            i.path = $path
-        """
-        tx.run(image_query, 
-               unit_id=media_item['unit_id'], 
-               filename=media_item['filename'], 
-               path=f"{media_item['folder_path']}/{media_item['filename']}")
+        unit_id = media_item.get('id', media_item.get('unit_id'))
+        filename = media_item.get('filename')
+        folder_path = media_item.get('folder', media_item.get('folder_path'))
+        owner = media_item.get('owner')
 
-        # 2. People Relationships
+        # 1. Photo Node
+        photo_query = """
+        MERGE (p:Photo {id: $unit_id})
+        SET p.filename = $filename,
+            p.folder = $folder_path
+        """
+        tx.run(photo_query, unit_id=unit_id, filename=filename, folder_path=folder_path)
+
+        # 2. Owner Node
+        if owner:
+            owner_query = """
+            MATCH (p:Photo {id: $unit_id})
+            MERGE (o:Owner {name: $owner})
+            MERGE (p)-[:OWNED_BY]->(o)
+            """
+            tx.run(owner_query, unit_id=unit_id, owner=owner)
+
+        # 3. Person & Family Relationships
         for person_name in media_item.get('people', []):
             person_query = """
-            MATCH (i:Image {unit_id: $unit_id})
-            MERGE (p:Person {name: $person_name})
-            MERGE (i)-[:HAS_PERSON]->(p)
+            MATCH (p:Photo {id: $unit_id})
+            MERGE (per:Person {name: $person_name})
+            MERGE (p)-[:HAS_PERSON]->(per)
             """
-            tx.run(person_query, unit_id=media_item['unit_id'], person_name=person_name)
+            tx.run(person_query, unit_id=unit_id, person_name=person_name)
+            
+            # Extract Family from Person (e.g. "John Doe" -> "Doe")
+            parts = person_name.strip().split()
+            if len(parts) > 1:
+                family_name = parts[-1]
+                family_query = """
+                MATCH (per:Person {name: $person_name})
+                MERGE (f:Family {name: $family_name})
+                MERGE (per)-[:BELONGS_TO_FAMILY]->(f)
+                """
+                tx.run(family_query, person_name=person_name, family_name=family_name)
 
-        # 3. Tag Relationships
+        # 4. Object (Tags) Relationships
         for tag_name in media_item.get('tags', []):
             tag_query = """
-            MATCH (i:Image {unit_id: $unit_id})
-            MERGE (t:Tag {name: $tag_name})
-            MERGE (i)-[:HAS_TAG]->(t)
+            MATCH (p:Photo {id: $unit_id})
+            MERGE (o:Object {name: $tag_name})
+            MERGE (p)-[:HAS_OBJECT]->(o)
             """
-            tx.run(tag_query, unit_id=media_item['unit_id'], tag_name=tag_name)
+            tx.run(tag_query, unit_id=unit_id, tag_name=tag_name)
 
 if __name__ == "__main__":
     # Test block

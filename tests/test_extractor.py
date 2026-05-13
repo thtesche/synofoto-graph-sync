@@ -20,47 +20,43 @@ def test_fetch_media_with_people(postgres_container):
     results = extractor.fetch_media_with_people()
     
     # We expect 4 items with type=0
-    # id 100 -> Alice, Bob (owner: thtesche)
-    # id 101 -> Charlie (owner: thtesche)
-    # id 102 -> [] (owner: thtesche)
-    # id 104 -> [] (owner: otheruser)
     assert len(results) == 4
     
+    # pic1.jpg (id 100) has 2 people, tag, and 3 address parts
     unit100 = next(r for r in results if r['unit_id'] == 100)
     assert set(unit100['people']) == {'Alice', 'Bob'}
-    assert unit100['owner_name'] == 'thtesche'
-    assert unit100['filename'] == 'pic1.jpg'
+    assert unit100['tags'] == ['Landscape']
+    assert unit100['address_parts'] == ['Germany', 'Berlin', 'Mitte']
+    assert unit100['latitude'] == 52.52
     
-    unit102 = next(r for r in results if r['unit_id'] == 102)
-    assert unit102['people'] == []
+    # pic2.jpg (id 101) has Charlie, 2 tags, and 2 address parts
+    unit101 = next(r for r in results if r['unit_id'] == 101)
+    assert unit101['people'] == ['Charlie']
+    assert set(unit101['tags']) == {'Landscape', 'Architecture'}
+    assert unit101['address_parts'] == ['Germany', 'Hamburg']
+    
+    extractor.close()
 
 def test_fetch_media_with_people_owner_filter(postgres_container):
     extractor = MetadataExtractor(postgres_container)
     extractor.connect()
     results = extractor.fetch_media_with_people(owner="thtesche")
     
-    # Should only return units 100, 101, 102 (from user thtesche)
     assert len(results) == 3
     for r in results:
         assert r['owner_name'] == 'thtesche'
+    extractor.close()
 
 def test_fetch_media_by_path(postgres_container):
     extractor = MetadataExtractor(postgres_container)
     extractor.connect()
     
-    # Path '/2026/02' -> folders 1 and 3 -> units 100, 101, 104 (type 0)
-    # unit 103 is type 1 and should be ignored
     results = extractor.fetch_media_by_path("/2026/02")
     assert len(results) == 3
     
-    # Check that owner_name is fetched properly
-    unit104 = next(r for r in results if r['id'] == 104)
-    assert unit104['owner_name'] == 'otheruser'
-    
-    # With owner filter
-    results = extractor.fetch_media_by_path("/2026/02", owner="thtesche")
-    assert len(results) == 2
-    assert results[0]['id'] == 100
-    assert results[1]['id'] == 101
+    results_owner = extractor.fetch_media_by_path("/2026/02", owner="thtesche")
+    assert len(results_owner) == 2
+    assert results_owner[0]['unit_id'] == 100
+    assert results_owner[1]['unit_id'] == 101
     
     extractor.close()

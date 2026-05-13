@@ -23,19 +23,17 @@ Für die Gesichtserkennung nutzt Synology zwei Tabellen, die die Person mit dem 
 
 Geografische Daten liegen sowohl als Rohkoordinaten als auch als aufgelöste Adressen vor.
 
-* **Tabelle `metadata`:** Speichert neben den EXIF-Daten auch die rohen GPS-Koordinaten (Latitude und Longitude) für die jeweilige `id_unit`.
-* **Tabelle `address`:** Beinhaltet die strukturierten und semantischen Geodaten (z.B. Stadt, Land). Über die Bedingung `lang = 0` lassen sich die Standardsprach-Einträge filtern.
+* **Tabelle `metadata`:** Speichert die rohen GPS-Koordinaten (`latitude` und `longitude`) für die jeweilige `id_unit`.
+* **Tabelle `address`:** Beinhaltet die detaillierten, hierarchischen Adressdaten (z. B. Stadt, Bundesland, Land). Über die Spalte `level` lässt sich die Granularität steuern und über `lang = 0` werden die Standardsprach-Einträge gefiltert.
 
 ## 4. Object (Entity)
 
 Von der KI erkannte Motive und abstrakte Konzepte werden in Synology Photos als Tags behandelt.
 
-* **Tabelle `general_tag`:** Speichert die Namen der erkannten Objekte/Tags (oft mit einer normalisierten, kleingeschriebenen Version des Namens).
-* **Verknüpfungstabelle `many_unit_has_many_general_tag`:** Dies ist die relationale n:m-Tabelle. Sie enthält die Kanten (Relationships), die ein Foto (über `id_unit` oder `id_item`) mit der ID des Objekts aus `general_tag` verbinden.
+* **Tabelle `general_tag`:** Speichert die Namen der erkannten Objekte/Tags.
+* **Verknüpfungstabelle `many_unit_has_many_general_tag`:** Verknüpft ein Foto (`id_unit`) mit den IDs der Tags aus `general_tag`.
 
 ## 5. Owner & Family (Entities - Besonderheiten)
 
-*Hinweis für die Implementierungslogik der KI-IDE:*
-
-* **Owner:** Es gibt in der `synofoto`-Datenbank keine explizite "Besitzer"-Tabelle für einzelne Fotos. Der Besitzer (Tenant) lässt sich jedoch über die **Tabelle `folder**` ableiten. Dort sind die Dateipfade gespeichert. Fotos im Pfad `/home/Photos/` gehören zum persönlichen Speicherplatz eines spezifischen Nutzers, während Fotos unter `/photo/` im freigegebenen Bereich liegen.
-* **Family:** Synology Photos hat kein natives Konzept für "Familiennamen". Deine KI muss diese Entity bei der Graph-Erstellung algorithmisch aus den Namens-Strings der Tabelle `person` extrahieren (z. B. durch Splitten von Vor- und Nachnamen) und daraus eigenständige `Family`-Knoten generieren.
+* **Owner:** Der Besitzer eines Fotos wird direkt über die Tabelle `user_info` identifiziert. Die Verknüpfung erfolgt von `unit.id_user` auf `user_info.id`. Der Name des Owners wird für die Erstellung der `Owner`-Knoten im Graphen verwendet.
+* **Family:** Synology Photos hat kein natives Konzept für "Familiennamen". Die KI extrahiert diese Entity algorithmisch aus den Namen der Tabelle `person` (z. B. durch Splitten von Vor- und Nachnamen) und generiert daraus eigenständige `Family`-Knoten.
