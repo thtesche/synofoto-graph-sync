@@ -119,13 +119,59 @@ def main():
                 msg = f"DRY RUN - ID: {_id}, Filename: {item['filename']}, Folder: {_folder}, Owner: {item.get('owner')}"
                 if _lat and _lon:
                     msg += f", GPS: ({_lat}, {_lon})"
-                if _people:
-                    msg += f", People: [{_people}]"
-                if _tags:
-                    msg += f", DB-Tags: [{_tags}]"
-                if _loc:
-                    msg += f", Location: ({_loc})"
                 print(msg)
+                
+                # Graph Structure Preview
+                print(f"  [Node] (p:Photo {{id: {_id}, filename: '{item['filename']}', gps: ({_lat or 'N/A'}, {_lon or 'N/A'})}})")
+                
+                if item.get('owner'):
+                    print(f"  [Edge] (p)-[:OWNED_BY]->(o:Owner {{name: '{item['owner']}'}})")
+                
+                for person in item.get('people') or []:
+                    print(f"  [Edge] (p)-[:HAS_PERSON]->(per:Person {{name: '{person}'}})")
+                    parts = person.strip().split()
+                    if len(parts) > 1:
+                        print(f"  [Edge] (per)-[:BELONGS_TO_FAMILY]->(f:Family {{name: '{parts[-1]}'}})")
+                
+                for tag in item.get('tags') or []:
+                    print(f"  [Edge] (p)-[:HAS_OBJECT]->(obj:Object {{name: '{tag}'}})")
+
+                # Location Hierarchy Preview
+                if _addr_objs:
+                    count = len(_addr_objs)
+                    prev_name = None
+                    for i, obj in enumerate(_addr_objs):
+                        level = obj.get('level')
+                        part_name = obj.get('value')
+                        
+                        # Poly-Labeling Logic
+                        labels = ["Location"]
+                        guessed_type = "District"
+                        
+                        if i == 0:
+                            labels.append("Country")
+                            guessed_type = "Country"
+                        elif i == count - 1 and count > 1:
+                            labels.append("Street")
+                            guessed_type = "Street"
+                        elif i == count - 2 and count > 2:
+                            guessed_type = "City"
+                        elif i == 1:
+                            guessed_type = "State"
+                        elif i == 2:
+                            guessed_type = "County"
+
+                        label_str = ":" + ":".join(labels)
+                        print(f"  [Node] (l{label_str} {{name: '{part_name}', type: '{guessed_type}', level: {level}, index: {i}}})")
+                        
+                        if prev_name and prev_name != part_name:
+                            print(f"  [Edge] (l:Location {{name: '{part_name}'}})-[:PART_OF]->(Location {{name: '{prev_name}'}})")
+                        prev_name = part_name
+                    
+                    if prev_name:
+                        print(f"  [Edge] (p)-[:LOCATED_AT]->(Location {{name: '{prev_name}'}})")
+                
+                print("-" * 40)
                 continue
 
             # Construct full path for XMP parsing

@@ -63,19 +63,28 @@ Geographical entities derived from the address table.
 
 ## 3. Transformation Logic
 
-### Location (Hierarchy)
-Geographical entities are derived from the `address` table. Due to varying administrative divisions across countries, we use Synology's internal `level` property to assign semantic labels:
-- **Level 1**: `:Country`
-- **Level 2**: `:State` (e.g., Brandenburg, Bavaria)
-- **Level 3**: `:County` (e.g., Barnim, Landkreis Wolfenbüttel)
-- **Level 4**: `:City` (e.g., Panketal, St. Lorenz)
-- **Level 5**: `:District` (e.g., Schwanebeck)
-- **Level 6+**: `:Street` (e.g., Zillertaler Straße, Hirschsteig)
+### Location Hierarchy (POLE+O: Location)
 
-The Importer creates a semantic chain based on available levels:
-`Photo -[:LOCATED_AT]-> [Most Specific] -[:PART_OF]-> [Higher Level] -[:PART_OF]-> Country`.
+Geodata is extracted from the `address` table. Due to inconsistent level numbering in Synology Photos, we use a **Poly-Labeling Strategy**:
 
-*Note: If a level is missing in the source data, the chain skips it and links directly to the next higher available level.*
+- **Labels**:
+    - Every node: `:Location`
+    - First node (Index 0): `:Country`
+    - Last node: `:Street` (only if more than 1 node exists)
+- **Properties**:
+    - `name`: The address component string (e.g., "Deutschland").
+    - `type`: Guessed semantic type based on position (`Country`, `State`, `County`, `City`, `District`, `Street`).
+    - `index`: Relative position (0-based).
+    - `level`: The original Synology DB level ID.
+- **Relationships**:
+    - `(Photo)-[:LOCATED_AT]->(Location)` (to the most specific location).
+    - `(Location)-[:PART_OF]->(Location)` (to the parent in the hierarchy).
+
+This strategy ensures that nodes like "Berlin" remain unique even if they appear at different levels in different photo metadata records.
+
+---
+
+## 5. Implementation Notes
 
 ### Tag Merging
 Tags are gathered from two sources and merged before import:

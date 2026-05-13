@@ -114,51 +114,53 @@ class GraphImporter:
         # 5. Location Hierarchy
         address_parts = media_item.get('address_parts') or []
         if address_parts:
-            # Mapping from Synology level to Graph Label
-            LEVEL_MAP = {
-                1: "Country",
-                2: "State",
-                3: "County",
-                4: "City",
-                5: "District",
-                6: "Street"
-            }
-            
-            prev_label = None
+            count = len(address_parts)
             prev_name = None
             
-            for part in address_parts:
-                level = part.get('level')
+            for i, part in enumerate(address_parts):
                 part_name = part.get('value')
+                level_id = part.get('level')
                 if not part_name:
                     continue
-                    
-                # Get label from map or fallback
-                label = LEVEL_MAP.get(level, "SubLocation")
-                if level and level > 6:
-                    label = "Street" # Everything beyond 6 is likely street-specific
                 
-                # Merge the location node
-                loc_merge = f"MERGE (l:{label} {{name: $part_name}})"
-                tx.run(loc_merge, part_name=part_name)
+                # Determine labels and guessed type
+                labels = ["Location"]
+                guessed_type = "District"
                 
-                # Link to parent (e.g., City -> County -> State -> Country)
-                if prev_name:
-                    link_query = f"""
-                    MATCH (child:{label} {{name: $part_name}})
-                    MATCH (parent:{prev_label} {{name: $prev_name}})
+                if i == 0:
+                    labels.append("Country")
+                    guessed_type = "Country"
+                elif i == count - 1 and count > 1:
+                    labels.append("Street")
+                    guessed_type = "Street"
+                elif i == count - 2 and count > 2:
+                    guessed_type = "City"
+                elif i == 1:
+                    guessed_type = "State"
+                elif i == 2:
+                    guessed_type = "County"
+
+                # MERGE node as :Location first to ensure uniqueness, then SET labels/props
+                label_str = ":" + ":".join(labels)
+                loc_merge = f"MERGE (l:Location {{name: $part_name}}) SET l{label_str}, l.type = $type, l.level = $level, l.index = $index"
+                tx.run(loc_merge, part_name=part_name, type=guessed_type, level=level_id, index=i)
+                
+                # Link to parent (e.g., Street -> City -> County -> State -> Country)
+                if prev_name and prev_name != part_name:
+                    link_query = """
+                    MATCH (child:Location {name: $part_name})
+                    MATCH (parent:Location {name: $prev_name})
                     MERGE (child)-[:PART_OF]->(parent)
                     """
                     tx.run(link_query, part_name=part_name, prev_name=prev_name)
                 
-                prev_label = label
                 prev_name = part_name
 
             # Link Photo to the most specific location found
-            if prev_label and prev_name:
-                photo_loc_query = f"""
-                MATCH (p:Photo {{id: $unit_id}})
-                MATCH (l:{prev_label} {{name: $prev_name}})
+            if prev_name:
+                photo_loc_query = """
+                MATCH (p:Photo {id: $unit_id})
+                MATCH (l:Location {name: $prev_name})
                 MERGE (p)-[:LOCATED_AT]->(l)
                 """
                 tx.run(photo_loc_query, unit_id=unit_id, prev_name=prev_name)
