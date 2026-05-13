@@ -95,3 +95,13 @@ If the deployment script indicates that the `venv` is missing on the NAS, perfor
 | **PostgreSQL** | `PG_DB` / `PG_HOST` | `synofoto` | The internal Synology Photos database. |
 | **Graph DB** | `GRAPHDB_URI` | `bolt://...` | Connection URI for Memgraph or Neo4j. |
 | **Task Scheduler** | - | `root` | Required for socket access to Postgres. |
+
+## Step F: Running the Sync
+
+You can run the synchronization manually at any time using the wrapper script:
+
+```bash
+sudo ./run_sync.sh
+```
+
+*Note: `sudo` is required to access the Synology Photos database socket.*

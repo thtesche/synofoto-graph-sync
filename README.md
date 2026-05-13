@@ -33,10 +33,10 @@ sudo venv/bin/python sync.py --doctor
 
 ### Run Sync
 
-Execute the main synchronization:
+Execute the main synchronization using the wrapper script:
 
 ```bash
-sudo venv/bin/python sync.py
+sudo ./run_sync.sh
 ```
 
 ---

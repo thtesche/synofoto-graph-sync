@@ -11,7 +11,7 @@ To keep your graph database up-to-date, set up a task in the **Synology Task Sch
 5. **Task Settings**: Run command:
 
    ```bash
-   cd /volume1/scripts/synofoto-graph-sync && ./venv/bin/python sync.py >> sync.log 2>&1
+   /bin/bash /volume1/scripts/synofoto-graph-sync/run_sync.sh
    ```
 
 ## Why root?
