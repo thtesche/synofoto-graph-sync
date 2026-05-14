@@ -1,5 +1,6 @@
 from neo4j import GraphDatabase
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -59,19 +60,32 @@ class GraphImporter:
         owner = media_item.get('owner')
 
         # 1. Photo Node
+        takentime_raw = media_item.get('takentime')
+        takentime_iso = None
+        if takentime_raw:
+            try:
+                # Synology takentime is typically a Unix timestamp in seconds
+                takentime_iso = datetime.fromtimestamp(takentime_raw).isoformat()
+            except Exception:
+                pass
+
         photo_query = """
         MERGE (p:Photo {id: $unit_id})
         SET p.filename = $filename,
             p.folder = $folder_path,
             p.latitude = $latitude,
-            p.longitude = $longitude
+            p.longitude = $longitude,
+            p.takentime = $takentime_raw,
+            p.takentime_iso = $takentime_iso
         """
         tx.run(photo_query, 
                unit_id=unit_id, 
                filename=filename, 
                folder_path=folder_path,
                latitude=media_item.get('latitude'),
-               longitude=media_item.get('longitude'))
+               longitude=media_item.get('longitude'),
+               takentime_raw=takentime_raw,
+               takentime_iso=takentime_iso)
 
         # 2. Owner Node
         if owner:

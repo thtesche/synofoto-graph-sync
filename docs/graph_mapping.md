@@ -13,6 +13,8 @@ The central node representing a media unit (image).
   - `path`: Absolute folder path on the NAS (e.g., `/volume1/photo/2026/02`)
   - `latitude`: GPS Latitude (if available)
   - `longitude`: GPS Longitude (if available)
+  - `takentime`: Unix timestamp (source: `unit.takentime`)
+  - `takentime_iso`: Human-readable ISO date
 
 ### Owner
 The user who owns the photo.

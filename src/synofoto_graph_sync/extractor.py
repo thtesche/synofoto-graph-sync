@@ -38,6 +38,7 @@ class MetadataExtractor:
         SELECT 
             u.id AS unit_id,
             u.filename,
+            u.takentime,
             f.name AS folder_path,
             ui.name AS owner_name,
             m.latitude, 
