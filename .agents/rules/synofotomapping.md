@@ -4,7 +4,7 @@ trigger: always_on
 
 # SynoFoto Mapping Rules
 
-Benutze die datei design/lpg_pole_o_model.md wenn es um das Mapping von postgres zur graph database geht.
-Benutze die datei design/synofoto_schema.md als erste Quelle für den Aufbau der synofoto db
+Use the file `design/lpg_pole_o_model.md` when it comes to mapping from Postgres to the graph database.
+Use the file `design/synofoto_schema.md` as the primary source for the structure of the synofoto db.
 
-Benutze den MCP webfetch für weiter unklare Fragen zum Aufbau der synofoto db mit folgenden github repos: <https://github.com/bexelbie/synofoto-media-count>
+Use the MCP webfetch for further unclear questions regarding the structure of the synofoto db with the following GitHub repos: <https://github.com/bexelbie/synofoto-media-count>
