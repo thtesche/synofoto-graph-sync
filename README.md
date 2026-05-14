@@ -84,6 +84,8 @@ The project uses **Integration Tests** with real database schemas.
 | **Milestone 2** | **XMP Parser** | ✅ DONE |
 | **Milestone 3** | **Graph Importer** | ✅ DONE |
 | **Milestone 4** | **Automation** | ✅ DONE |
+| **Milestone 5** | **Test GLiNER2 for better utilisation of keywords** | ⏳ TODO |
+| **Milestone 6** | **delete orphaned images from graph** | ⏳ TODO |
 
 ---
 
