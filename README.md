@@ -3,7 +3,6 @@
 ![Python CI](https://github.com/thtesche/synofoto-graph-sync/actions/workflows/ci.yml/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-
 **Goal:** Synchronize Synology Photos metadata and AI tags into a Graph Database (Memgraph or Neo4j) to enable powerful graph-based discovery and relationship analysis.
 
 ---
@@ -57,6 +56,7 @@ The project uses **Integration Tests** with real database schemas.
 
 - **Requirement**: You need a running Docker environment (Docker Desktop, OrbStack, or Colima) on your local machine.
 - **Run Tests**:
+
   ```bash
   venv/bin/pytest tests/
   ```
