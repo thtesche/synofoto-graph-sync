@@ -63,12 +63,12 @@ Since system paths like `/volume1/scripts/` are protected, you must manually cre
 
 ## Step C: Deploy to NAS
 
-Use the `copy_to_nas.sh` script to synchronize the project files to the NAS.
+Use the `deploy_to_nas.sh` script to synchronize the project files to the NAS.
 
 1. Run the script on your local machine:
 
    ```bash
-   ./copy_to_nas.sh
+   ./deploy_to_nas.sh
    ```
 
    *This script uses a `tar` pipe over SSH to copy only the necessary application files to your NAS.*

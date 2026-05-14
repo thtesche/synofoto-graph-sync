@@ -39,6 +39,7 @@ class MetadataExtractor:
             u.id AS unit_id,
             u.filename,
             u.takentime,
+            u.cache_key,
             f.name AS folder_path,
             ui.name AS owner_name,
             m.latitude, 

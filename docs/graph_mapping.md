@@ -15,6 +15,7 @@ The central node representing a media unit (image).
   - `longitude`: GPS Longitude (if available)
   - `takentime`: Unix timestamp (source: `unit.takentime`)
   - `takentime_iso`: Human-readable ISO date
+  - `cache_key`: Key for thumbnail access (source: `unit.cache_key`)
 
 ### Owner
 The user who owns the photo.

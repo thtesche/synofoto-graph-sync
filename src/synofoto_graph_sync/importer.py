@@ -76,7 +76,8 @@ class GraphImporter:
             p.latitude = $latitude,
             p.longitude = $longitude,
             p.takentime = $takentime_raw,
-            p.takentime_iso = $takentime_iso
+            p.takentime_iso = $takentime_iso,
+            p.cache_key = $cache_key
         """
         tx.run(photo_query, 
                unit_id=unit_id, 
@@ -85,7 +86,8 @@ class GraphImporter:
                latitude=media_item.get('latitude'),
                longitude=media_item.get('longitude'),
                takentime_raw=takentime_raw,
-               takentime_iso=takentime_iso)
+               takentime_iso=takentime_iso,
+               cache_key=media_item.get('cache_key'))
 
         # 2. Owner Node
         if owner:

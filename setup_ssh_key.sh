@@ -22,7 +22,7 @@ ssh-copy-id -o StrictHostKeyChecking=no ${NAS_USER}@${NAS_IP}
 
 if [ $? -eq 0 ]; then
     echo "--- Success! ---"
-    echo "You should now be able to run ./copy_to_nas.sh without a password."
+    echo "You should now be able to run ./deploy_to_nas.sh without a password."
 else
     echo "--- Failed to copy key ---"
     echo "Make sure SSH is enabled on your Synology (Control Panel -> Terminal & SNMP)."

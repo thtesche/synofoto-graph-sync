@@ -34,6 +34,7 @@ Represents a single media item (image or video).
   - `longitude`: GPS Longitude (if available)
   - `takentime`: Unix timestamp (source: `unit.takentime`)
   - `takentime_iso`: Human-readable ISO date
+  - `cache_key`: Key used to access thumbnails (source: `unit.cache_key`).
 
 ### `Person`
 Represents a person identified in a photo.
