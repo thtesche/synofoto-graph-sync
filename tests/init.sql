@@ -23,7 +23,8 @@ CREATE TABLE unit (
     id_user INTEGER NOT NULL,
     type SMALLINT NOT NULL DEFAULT 0,
     filename TEXT NOT NULL,
-    id_folder INTEGER NOT NULL
+    id_folder INTEGER NOT NULL,
+    takentime BIGINT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE metadata (
@@ -62,12 +63,12 @@ INSERT INTO folder (id, id_user, name) VALUES
 (2, 1, '/2026/03'),
 (3, 2, '/2026/02');
 
-INSERT INTO unit (id, id_user, type, filename, id_folder) VALUES 
-(100, 1, 0, 'pic1.jpg', 1),
-(101, 1, 0, 'pic2.jpg', 1),
-(102, 1, 0, 'pic3.jpg', 2),
-(103, 1, 1, 'video.mp4', 1),
-(104, 2, 0, 'other.jpg', 3);
+INSERT INTO unit (id, id_user, type, filename, id_folder, takentime) VALUES 
+(100, 1, 0, 'pic1.jpg', 1, 1715684400),
+(101, 1, 0, 'pic2.jpg', 1, 1715688000),
+(102, 1, 0, 'pic3.jpg', 2, 1715691600),
+(103, 1, 1, 'video.mp4', 1, 1715695200),
+(104, 2, 0, 'other.jpg', 3, 1715698800);
 
 INSERT INTO address (id_unit, lang, level, value, id_user) VALUES 
 (100, 0, 1, 'Germany', 1),

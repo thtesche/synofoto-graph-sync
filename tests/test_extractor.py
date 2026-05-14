@@ -31,6 +31,7 @@ def test_fetch_media_with_people(postgres_container):
         {'level': 3, 'value': 'Mitte'}
     ]
     assert unit100['latitude'] == 52.52
+    assert unit100['takentime'] == 1715684400
     
     # pic2.jpg (id 101) has Charlie, 2 tags, and 2 address parts
     unit101 = next(r for r in results if r['unit_id'] == 101)
