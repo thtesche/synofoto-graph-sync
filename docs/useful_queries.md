@@ -44,3 +44,12 @@ RETURN obj.name, count(*) as frequency
 ORDER BY frequency DESC
 LIMIT 20
 ```
+
+## 7. Graphview Ohne Objects (Nur grafische Ausgabe)
+Lade den Graphen zur Visualisierung, aber lasse die `Object`-Knoten (Tags) aus, um die Ansicht übersichtlicher zu machen.
+```cypher
+MATCH p=()-[r]->()
+WHERE NOT any(n IN nodes(p) WHERE 'Object' IN labels(n))
+RETURN p
+LIMIT 50
+```
