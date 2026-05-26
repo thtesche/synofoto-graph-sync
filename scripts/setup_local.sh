@@ -2,6 +2,10 @@
 
 echo "--- Local Setup: Synofoto-Graph-Sync ---"
 
+# Get the directory where this script is located and cd to project root
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd "$SCRIPT_DIR/.."
+
 if [ ! -f .env ]; then
     echo "Creating .env file from .env.example..."
     cp .env.example .env

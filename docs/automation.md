@@ -11,7 +11,7 @@ To keep your graph database up-to-date, set up a task in the **Synology Task Sch
 5. **Task Settings**: Run command:
 
    ```bash
-   /bin/bash /volume1/scripts/synofoto-graph-sync/run_sync.sh
+   /bin/bash /volume1/scripts/synofoto-graph-sync/scripts/run_sync.sh
    ```
 
 ## Why root?

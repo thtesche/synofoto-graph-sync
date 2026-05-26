@@ -9,7 +9,7 @@ Before deploying to the NAS, initialize your local environment and configuration
 1. Run the local setup script:
 
    ```bash
-   ./setup_local.sh
+   ./scripts/setup_local.sh
    ```
 
    *This will create a `.env` file and prompt you for your NAS details.*
@@ -17,7 +17,7 @@ Before deploying to the NAS, initialize your local environment and configuration
 2. Run the SSH key setup script (Highly Recommended):
 
    ```bash
-   ./setup_ssh_key.sh
+   ./scripts/setup_ssh_key.sh
    ```
 
    *This will generate an SSH key and copy it to your NAS to avoid password prompts.*
@@ -68,7 +68,7 @@ Use the `deploy_to_nas.sh` script to synchronize the project files to the NAS.
 1. Run the script on your local machine:
 
    ```bash
-   ./deploy_to_nas.sh
+   ./scripts/deploy_to_nas.sh
    ```
 
    *This script uses a `tar` pipe over SSH to copy only the necessary application files to your NAS.*
@@ -101,7 +101,7 @@ If the deployment script indicates that the `venv` is missing on the NAS, perfor
 You can run the synchronization manually at any time using the wrapper script:
 
 ```bash
-sudo ./run_sync.sh
+sudo ./scripts/run_sync.sh
 ```
 
 *Note: `sudo` is required to access the Synology Photos database socket.*

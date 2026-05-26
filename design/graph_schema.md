@@ -55,6 +55,7 @@ Represents AI-detected tags or general tags.
 Represents a geographical entity (hierarchical).
 - **Labels (Multi-label):** `:Location` and one of `:Country`, `:State`, `:County`, `:City`, `:Street`.
 - **Properties:**
+  - `id`: Unique identifier representing the full hierarchical path (e.g., "Germany|Berlin|Mitte").
   - `name`: Name of the location part.
   - `type`: Type descriptor (e.g., "City").
   - `level`: Synology hierarchy level (source: `address.admin`).

@@ -128,16 +128,19 @@ class GraphImporter:
             tx.run(tag_query, unit_id=unit_id, tag_name=tag_name)
 
         # 5. Location Hierarchy
-        address_parts = media_item.get('address_parts') or []
+        raw_address_parts = media_item.get('address_parts') or []
+        address_parts = [p for p in raw_address_parts if p.get('value')]
         if address_parts:
             count = len(address_parts)
-            prev_name = None
+            path_parts = [p.get('value') for p in address_parts]
+            prev_id = None
             
             for i, part in enumerate(address_parts):
                 part_name = part.get('value')
                 level_id = part.get('level')
-                if not part_name:
-                    continue
+                
+                # Unique ID for this node based on its full path in the hierarchy
+                node_id = "|".join(path_parts[:i+1])
                 
                 # Determine labels and guessed type
                 labels = ["Location"]
@@ -156,30 +159,30 @@ class GraphImporter:
                 elif i == 2:
                     guessed_type = "County"
 
-                # MERGE node as :Location first to ensure uniqueness, then SET labels/props
+                # MERGE node as :Location first to ensure uniqueness by ID, then SET labels/props
                 label_str = ":" + ":".join(labels)
-                loc_merge = f"MERGE (l:Location {{name: $part_name}}) SET l{label_str}, l.type = $type, l.level = $level, l.index = $index"
-                tx.run(loc_merge, part_name=part_name, type=guessed_type, level=level_id, index=i)
+                loc_merge = f"MERGE (l:Location {{id: $node_id}}) SET l{label_str}, l.name = $part_name, l.type = $type, l.level = $level, l.index = $index"
+                tx.run(loc_merge, node_id=node_id, part_name=part_name, type=guessed_type, level=level_id, index=i)
                 
                 # Link to parent (e.g., Street -> City -> County -> State -> Country)
-                if prev_name and prev_name != part_name:
+                if prev_id:
                     link_query = """
-                    MATCH (child:Location {name: $part_name})
-                    MATCH (parent:Location {name: $prev_name})
+                    MATCH (child:Location {id: $child_id})
+                    MATCH (parent:Location {id: $parent_id})
                     MERGE (child)-[:PART_OF]->(parent)
                     """
-                    tx.run(link_query, part_name=part_name, prev_name=prev_name)
+                    tx.run(link_query, child_id=node_id, parent_id=prev_id)
                 
-                prev_name = part_name
+                prev_id = node_id
 
             # Link Photo to the most specific location found
-            if prev_name:
+            if prev_id:
                 photo_loc_query = """
                 MATCH (p:Photo {id: $unit_id})
-                MATCH (l:Location {name: $prev_name})
+                MATCH (l:Location {id: $loc_id})
                 MERGE (p)-[:LOCATED_AT]->(l)
                 """
-                tx.run(photo_loc_query, unit_id=unit_id, prev_name=prev_name)
+                tx.run(photo_loc_query, unit_id=unit_id, loc_id=prev_id)
 
 if __name__ == "__main__":
     # Test block

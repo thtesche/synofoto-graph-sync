@@ -16,7 +16,7 @@
 ## 🚀 Quick Start
 
 1. **[Database Setup](docs/setup_database.md)**: Install Neo4j or Memgraph on your NAS via Container Manager.
-2. **[Installation](docs/installation.md)**: Run `./setup_local.sh` and deploy to NAS with `./deploy_to_nas.sh`.
+2. **[Installation](docs/installation.md)**: Run `./scripts/setup_local.sh` and deploy to NAS with `./scripts/deploy_to_nas.sh`.
 3. **[Automation](docs/automation.md)**: Schedule the sync task in Synology Task Scheduler.
 
 ---
@@ -45,7 +45,7 @@ sudo venv/bin/python sync.py --doctor
 Execute the main synchronization using the wrapper script:
 
 ```bash
-sudo ./run_sync.sh
+sudo ./scripts/run_sync.sh
 ```
 
 ---

@@ -136,12 +136,15 @@ def main():
                     print(f"  [Edge] (p)-[:HAS_OBJECT]->(obj:Object {{name: '{tag}'}})")
 
                 # Location Hierarchy Preview
-                if _addr_objs:
-                    count = len(_addr_objs)
-                    prev_name = None
-                    for i, obj in enumerate(_addr_objs):
+                _addr_objs_filtered = [obj for obj in _addr_objs if obj.get('value')]
+                if _addr_objs_filtered:
+                    count = len(_addr_objs_filtered)
+                    path_parts = [obj.get('value') for obj in _addr_objs_filtered]
+                    prev_id = None
+                    for i, obj in enumerate(_addr_objs_filtered):
                         level = obj.get('level')
                         part_name = obj.get('value')
+                        node_id = "|".join(path_parts[:i+1])
                         
                         # Poly-Labeling Logic
                         labels = ["Location"]
@@ -161,14 +164,14 @@ def main():
                             guessed_type = "County"
 
                         label_str = ":" + ":".join(labels)
-                        print(f"  [Node] (l{label_str} {{name: '{part_name}', type: '{guessed_type}', level: {level}, index: {i}}})")
+                        print(f"  [Node] (l{label_str} {{id: '{node_id}', name: '{part_name}', type: '{guessed_type}', level: {level}, index: {i}}})")
                         
-                        if prev_name and prev_name != part_name:
-                            print(f"  [Edge] (l:Location {{name: '{part_name}'}})-[:PART_OF]->(Location {{name: '{prev_name}'}})")
-                        prev_name = part_name
+                        if prev_id:
+                            print(f"  [Edge] (l:Location {{id: '{node_id}'}})-[:PART_OF]->(Location {{id: '{prev_id}'}})")
+                        prev_id = node_id
                     
-                    if prev_name:
-                        print(f"  [Edge] (p)-[:LOCATED_AT]->(Location {{name: '{prev_name}'}})")
+                    if prev_id:
+                        print(f"  [Edge] (p)-[:LOCATED_AT]->(Location {{id: '{prev_id}'}})")
                 
                 print("-" * 40)
                 continue

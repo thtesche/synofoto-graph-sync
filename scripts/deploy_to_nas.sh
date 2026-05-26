@@ -1,10 +1,14 @@
 #!/bin/bash
 
+# Get the directory where this script is located and cd to project root
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd "$SCRIPT_DIR/.."
+
 # Load configuration from .env
 if [ -f .env ]; then
     export $(grep -v '^[[:space:]]*#' .env | grep -v '^[[:space:]]*$' | xargs)
 else
-    echo "Error: .env file not found. Please run ./setup_local.sh first."
+    echo "Error: .env file not found. Please run ./scripts/setup_local.sh first."
     exit 1
 fi
 
@@ -38,8 +42,8 @@ COPYFILE_DISABLE=1 tar -cz \
     --exclude='test.py' \
     --exclude='*.log' \
     --exclude='pyproject.toml' \
-    --exclude='setup_*.sh' \
-    --exclude='deploy_to_nas.sh' \
+    --exclude='scripts/setup_*.sh' \
+    --exclude='scripts/deploy_to_nas.sh' \
     --exclude='.env.example' \
     --exclude='.gitignore' \
     --exclude='LICENSE' \
@@ -51,7 +55,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Cleanup existing ._ files and setup scripts on NAS if any were already copied
-ssh ${NAS_USER}@${NAS_IP} "find ${NAS_DEST_PATH} -name '._*' -delete; rm -f ${NAS_DEST_PATH}/setup_*.sh ${NAS_DEST_PATH}/copy_to_nas.sh ${NAS_DEST_PATH}/*.md ${NAS_DEST_PATH}/.env.example ${NAS_DEST_PATH}/.gitignore ${NAS_DEST_PATH}/test.py ${NAS_DEST_PATH}/*.log ${NAS_DEST_PATH}/pyproject.toml ${NAS_DEST_PATH}/LICENSE; rm -rf ${NAS_DEST_PATH}/.github ${NAS_DEST_PATH}/.agents ${NAS_DEST_PATH}/.benchmarks ${NAS_DEST_PATH}/.ruff_cache ${NAS_DEST_PATH}/.pytest_cache ${NAS_DEST_PATH}/docs ${NAS_DEST_PATH}/tests ${NAS_DEST_PATH}/design ${NAS_DEST_PATH}/scratch"
+ssh ${NAS_USER}@${NAS_IP} "find ${NAS_DEST_PATH} -name '._*' -delete; rm -f ${NAS_DEST_PATH}/setup_*.sh ${NAS_DEST_PATH}/deploy_to_nas.sh ${NAS_DEST_PATH}/scripts/setup_*.sh ${NAS_DEST_PATH}/scripts/deploy_to_nas.sh ${NAS_DEST_PATH}/copy_to_nas.sh ${NAS_DEST_PATH}/*.md ${NAS_DEST_PATH}/.env.example ${NAS_DEST_PATH}/.gitignore ${NAS_DEST_PATH}/test.py ${NAS_DEST_PATH}/*.log ${NAS_DEST_PATH}/pyproject.toml ${NAS_DEST_PATH}/LICENSE; rm -rf ${NAS_DEST_PATH}/.github ${NAS_DEST_PATH}/.agents ${NAS_DEST_PATH}/.benchmarks ${NAS_DEST_PATH}/.ruff_cache ${NAS_DEST_PATH}/.pytest_cache ${NAS_DEST_PATH}/docs ${NAS_DEST_PATH}/tests ${NAS_DEST_PATH}/design ${NAS_DEST_PATH}/scratch"
 
 echo "--- Checking NAS Status ---"
 ssh $SSH_OPTS ${NAS_USER}@${NAS_IP} << nas_ssh
