@@ -14,6 +14,7 @@ CREATE TABLE address (
     id_unit INTEGER NOT NULL,
     lang SMALLINT NOT NULL,
     level INTEGER NOT NULL,
+    admin SMALLINT NOT NULL,
     value TEXT NOT NULL,
     id_user INTEGER NOT NULL
 );
@@ -71,12 +72,12 @@ INSERT INTO unit (id, id_user, type, filename, id_folder, takentime, cache_key) 
 (103, 1, 1, 'video.mp4', 1, 1715695200, 'key103'),
 (104, 2, 0, 'other.jpg', 3, 1715698800, 'key104');
 
-INSERT INTO address (id_unit, lang, level, value, id_user) VALUES 
-(100, 0, 1, 'Germany', 1),
-(100, 0, 2, 'Berlin', 1),
-(100, 0, 3, 'Mitte', 1),
-(101, 0, 1, 'Germany', 1),
-(101, 0, 2, 'Hamburg', 1);
+INSERT INTO address (id_unit, lang, level, admin, value, id_user) VALUES 
+(100, 0, 1, 1, 'Germany', 1),
+(100, 0, 2, 2, 'Berlin', 1),
+(100, 0, 3, 3, 'Mitte', 1),
+(101, 0, 1, 1, 'Germany', 1),
+(101, 0, 2, 2, 'Hamburg', 1);
 
 INSERT INTO metadata (id_unit, latitude, longitude) VALUES 
 (100, 52.52, 13.405),
