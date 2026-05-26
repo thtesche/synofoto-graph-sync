@@ -57,7 +57,7 @@ Represents a geographical entity (hierarchical).
 - **Properties:**
   - `name`: Name of the location part.
   - `type`: Type descriptor (e.g., "City").
-  - `level`: Synology hierarchy level.
+  - `level`: Synology hierarchy level (source: `address.admin`).
   - `index`: Position in the address hierarchy.
 
 ### `Owner`

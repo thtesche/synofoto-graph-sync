@@ -43,7 +43,7 @@ AI-recognized tags or objects.
 
 ### Location (Hierarchy)
 Geographical entities derived from the address table.
-- **Source Table**: `address` (levels 1-5)
+- **Source Table**: `address` (admin column levels)
 - **Labels**: `Country`, `Region`, `City`
 - **Properties**:
   - `name`: Name of the location part (e.g., `Germany`, `Baden-Württemberg`)
@@ -77,7 +77,7 @@ Geodata is extracted from the `address` table. Due to inconsistent level numberi
     - `name`: The address component string (e.g., "Deutschland").
     - `type`: Guessed semantic type based on position (`Country`, `State`, `County`, `City`, `District`, `Street`).
     - `index`: Relative position (0-based).
-    - `level`: The original Synology DB level ID.
+    - `level`: The original Synology DB `admin` column value.
 - **Relationships**:
     - `(Photo)-[:LOCATED_AT]->(Location)` (to the most specific location).
     - `(Location)-[:PART_OF]->(Location)` (to the parent in the hierarchy).

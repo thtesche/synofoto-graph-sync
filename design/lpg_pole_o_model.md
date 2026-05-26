@@ -24,7 +24,7 @@ For facial recognition, Synology uses two tables that connect the person to the 
 Geographical data is available both as raw coordinates and as resolved addresses.
 
 * **Table `metadata`:** Stores the raw GPS coordinates (`latitude` and `longitude`) for the respective `id_unit`.
-* **Table `address`:** Contains detailed, hierarchical address data (e.g., city, state, country). The granularity can be controlled via the `level` column, and default language entries are filtered via `lang = 0`.
+* **Table `address`:** Contains detailed, hierarchical address data (e.g., city, state, country). The granularity can be controlled via the `admin` column, and default language entries are filtered via `lang = 0`.
 
 ## 4. Object (Entity)
 
