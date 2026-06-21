@@ -40,15 +40,15 @@ Verify that both databases are reachable:
 sudo venv/bin/python sync.py --doctor
 ```
 
-### Run Sync
-
-Execute the main synchronization using the wrapper script:
+### Run Prune
+Remove photos and associated nodes from the graph that are no longer present in Synology Photos:
 
 ```bash
-sudo ./scripts/run_sync.sh
+sudo ./scripts/run_prune.sh
 ```
 
 ---
+
 
 ## 🧪 Development & Testing
 
@@ -85,7 +85,7 @@ The project uses **Integration Tests** with real database schemas.
 | **Milestone 3** | **Graph Importer** | ✅ DONE |
 | **Milestone 4** | **Automation** | ✅ DONE |
 | **Milestone 5** | **Test GLiNER2 for better utilisation of keywords** | ⏳ TODO |
-| **Milestone 6** | **delete orphaned images from graph** | ⏳ TODO |
+| **Milestone 6** | **delete orphaned images from graph** | ✅ DONE |
 
 ---
 

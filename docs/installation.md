@@ -96,12 +96,18 @@ If the deployment script indicates that the `venv` is missing on the NAS, perfor
 | **Graph DB** | `GRAPHDB_URI` | `bolt://...` | Connection URI for Memgraph or Neo4j. |
 | **Task Scheduler** | - | `root` | Required for socket access to Postgres. |
 
-## Step F: Running the Sync
+## Step F: Running the Sync & Cleanup
 
 You can run the synchronization manually at any time using the wrapper script:
 
 ```bash
 sudo ./scripts/run_sync.sh
+```
+
+To remove photos and associated nodes from the graph that are no longer present in Synology Photos, run the prune script:
+
+```bash
+sudo ./scripts/run_prune.sh
 ```
 
 *Note: `sudo` is required to access the Synology Photos database socket.*
